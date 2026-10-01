@@ -4,11 +4,13 @@ import com.jobagent.entity.User;
 import com.jobagent.entity.UserSettings;
 import com.jobagent.repository.CandidateProfileRepository;
 import com.jobagent.repository.UserSettingsRepository;
+import com.jobagent.service.AuthService;
 import com.jobagent.service.AutoApplyEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,15 +33,18 @@ public class AgentController {
     private final AutoApplyEngine autoApplyEngine;
     private final UserSettingsRepository settingsRepository;
     private final CandidateProfileRepository profileRepository;
+    private final AuthService authService;
 
     public AgentController(
         AutoApplyEngine autoApplyEngine,
         UserSettingsRepository settingsRepository,
-        CandidateProfileRepository profileRepository
+        CandidateProfileRepository profileRepository,
+        AuthService authService
     ) {
         this.autoApplyEngine = autoApplyEngine;
         this.settingsRepository = settingsRepository;
         this.profileRepository = profileRepository;
+        this.authService = authService;
     }
 
     /**
@@ -47,7 +52,8 @@ public class AgentController {
      * Returns a summary of what was applied, skipped, or failed.
      */
     @PostMapping("/run")
-    public ResponseEntity<?> triggerNow(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> triggerNow(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = authService.getCurrentUser(userDetails.getUsername());
         log.info("AGENT_API: Manual trigger by user {}", user.getEmail());
 
         var profile = profileRepository.findByUserId(user.getId()).orElse(null);
@@ -59,15 +65,14 @@ public class AgentController {
             ));
         }
 
-        var settings = settingsRepository.findByUserId(user.getId()).orElse(new UserSettings());
+        var settings = settingsRepository.findByUserId(user.getId()).orElseGet(UserSettings::new);
 
-        // Temporarily force auto-apply to true for this manual run
+        // Force auto-apply on for this manual run regardless of saved setting
         boolean wasAutoApply = Boolean.TRUE.equals(settings.getAutoApplyEnabled());
         settings.setAutoApplyEnabled(true);
 
         AutoApplyEngine.AutoApplyUserResult result = autoApplyEngine.runForUser(user, profile, settings);
 
-        // Restore original setting if it wasn't already on
         if (!wasAutoApply) {
             settings.setAutoApplyEnabled(false);
         }
@@ -88,7 +93,9 @@ public class AgentController {
      * Enable autonomous auto-apply — agent will apply automatically every hour.
      */
     @PostMapping("/enable")
-    public ResponseEntity<?> enableAutoApply(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> enableAutoApply(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = authService.getCurrentUser(userDetails.getUsername());
+
         UserSettings settings = settingsRepository.findByUserId(user.getId())
             .orElseGet(() -> {
                 UserSettings s = new UserSettings();
@@ -110,7 +117,9 @@ public class AgentController {
      * Disable autonomous auto-apply — agent stops automatic submissions.
      */
     @PostMapping("/disable")
-    public ResponseEntity<?> disableAutoApply(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> disableAutoApply(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = authService.getCurrentUser(userDetails.getUsername());
+
         UserSettings settings = settingsRepository.findByUserId(user.getId())
             .orElseGet(() -> {
                 UserSettings s = new UserSettings();
@@ -132,7 +141,8 @@ public class AgentController {
      * Get current agent configuration and status for this user.
      */
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getStatus(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = authService.getCurrentUser(userDetails.getUsername());
         var settings = settingsRepository.findByUserId(user.getId()).orElse(new UserSettings());
         var profile = profileRepository.findByUserId(user.getId()).orElse(null);
 
