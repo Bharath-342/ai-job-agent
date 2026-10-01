@@ -23,7 +23,6 @@ backend/h2data/
 frontend/node_modules/
 frontend/dist/
 frontend/build/
-backend/src/main/resources/static/
 frontend/.eslintcache
 frontend/coverage/
 
