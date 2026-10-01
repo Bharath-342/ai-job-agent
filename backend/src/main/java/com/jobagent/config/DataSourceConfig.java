@@ -50,10 +50,17 @@ public class DataSourceConfig {
                 
                 String query = uri.getQuery();
                 if (query != null && !query.isEmpty()) {
-                    jdbcUrl += "?" + query;
+                    if (!query.contains("currentSchema")) {
+                        jdbcUrl += "?" + query + "&currentSchema=ai_job_agent";
+                    } else {
+                        jdbcUrl += "?" + query;
+                    }
                 } else {
-                    jdbcUrl += "?sslmode=require";
+                    jdbcUrl += "?currentSchema=ai_job_agent&sslmode=require";
                 }
+
+                config.setConnectionInitSql("CREATE SCHEMA IF NOT EXISTS ai_job_agent; SET search_path TO ai_job_agent, public;");
+                config.setSchema("ai_job_agent");
 
                 if (uri.getUserInfo() != null) {
                     String[] userInfo = uri.getUserInfo().split(":");

@@ -20,6 +20,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    schemas: ${FLYWAY_SCHEMA:ai_job_agent}
+    default-schema: ${FLYWAY_DEFAULT_SCHEMA:ai_job_agent}
     locations: classpath:db/migration
   servlet:
     multipart:
