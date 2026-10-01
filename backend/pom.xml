@@ -69,6 +69,12 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
+        <!-- Email Notifications -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- Document Parsing (PDF & DOCX) -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>

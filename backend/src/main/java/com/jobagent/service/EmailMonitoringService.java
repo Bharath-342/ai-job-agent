@@ -171,4 +171,17 @@ public class EmailMonitoringService {
         }
         return dto;
     }
+
+    /**
+     * Poll all users' connected Gmail OAuth mailboxes for employer replies.
+     * Full Gmail API integration is wired in V2; this is the scheduler entry point.
+     */
+    public void pollAllConnectedMailboxes() {
+        if (!realEmailEnabled) {
+            return;
+        }
+        log.info("EMAIL_POLL: Polling connected Gmail mailboxes for employer responses");
+        // TODO V2: Iterate users with gmail_token set, call Gmail API, process via processIncomingEmail()
+    }
 }
+
