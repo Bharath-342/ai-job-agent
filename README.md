@@ -7,7 +7,10 @@ A production-ready, autonomous, and human-in-the-loop AI Job Application Agent t
 ![Target Country](https://img.shields.io/badge/Country-India-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-**GitHub Repository:** [https://github.com/Bharath-342/ai-job-agent](https://github.com/Bharath-342/ai-job-agent)
+**GitHub Repository:** [https://github.com/Bharath-342/ai-job-agent](https://github.com/Bharath-342/ai-job-agent)  
+**Live Production URL:** [https://ai-job-agent-qtyz.onrender.com](https://ai-job-agent-qtyz.onrender.com)  
+**Live Health Endpoint:** [https://ai-job-agent-qtyz.onrender.com/api/health](https://ai-job-agent-qtyz.onrender.com/api/health)  
+**Live Interactive Swagger:** [https://ai-job-agent-qtyz.onrender.com/swagger-ui.html](https://ai-job-agent-qtyz.onrender.com/swagger-ui.html)  
 
 ---
 
