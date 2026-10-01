@@ -2,10 +2,12 @@
 
 A production-ready, autonomous, and human-in-the-loop AI Job Application Agent tailored for **Indian IT/Software 2026 Freshers**.
 
-![Build & Test Status](https://img.shields.io/badge/build-passing-brightgreen)
+[![CI Build & Test](https://github.com/Bharath-342/ai-job-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Bharath-342/ai-job-agent/actions/workflows/ci.yml)
 ![Target Batch](https://img.shields.io/badge/Batch-2026%20Fresher-blue)
 ![Target Country](https://img.shields.io/badge/Country-India-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+**GitHub Repository:** [https://github.com/Bharath-342/ai-job-agent](https://github.com/Bharath-342/ai-job-agent)
 
 ---
 
@@ -144,3 +146,54 @@ npm run build
 - **Least Privilege OAuth**: Only requests Gmail read-only scopes.
 - **Never Commits Secrets**: Sensitive tokens and credentials are excluded via `.gitignore`.
 - **Supported Integrations**: Verified ATS platforms (Greenhouse, Lever test mocks, verified partner APIs). Unsupported platforms prompt `MANUAL_ACTION_REQUIRED`.
+
+---
+
+## 🌐 Production Deployment Architecture
+
+```mermaid
+flowchart TD
+    User([User Browser]) -->|HTTPS| Frontend[Vercel: React + Vite Frontend]
+    Frontend -->|REST API with JWT| Backend[Render / Railway: Spring Boot Backend]
+    Backend -->|JDBC SSL| DB[(Managed PostgreSQL)]
+    Backend -->|OAuth2| Google[Google Gmail API]
+    Backend -->|HTTPS| ATS[Official Career ATS Endpoints]
+```
+
+### 1. Frontend Deployment (Vercel)
+- **Framework Preset**: Vite
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Environment Variables**:
+  - `VITE_API_BASE_URL`: `https://YOUR-BACKEND-DOMAIN.onrender.com/api`
+
+### 2. Backend Deployment (Render / Railway / AWS)
+- **Environment**: Docker or Native Java (`Coretto 21` / `Temurin 21`)
+- **Root Directory**: `backend`
+- **Build Command**: `./mvnw clean package -DskipTests`
+- **Start Command**: `java -jar target/ai-job-agent-1.0.0.jar`
+- **Required Environment Variables**:
+  - `DATABASE_URL`: `jdbc:postgresql://<host>:5432/<dbname>?sslmode=require`
+  - `DATABASE_USERNAME`: `<db_user>`
+  - `DATABASE_PASSWORD`: `<db_password>`
+  - `FRONTEND_URL`: `https://YOUR-FRONTEND.vercel.app`
+  - `MOCK_MODE`: `false` (for production)
+  - `JWT_SECRET`: (64-byte random hex key)
+
+### 3. API Documentation & Health Check Endpoints
+- **OpenAPI / Swagger UI**: `http://localhost:8080/swagger-ui.html` (Local) / `/swagger-ui.html` (Production)
+- **OpenAPI Schema**: `/v3/api-docs`
+- **Health Check**: `/api/health`
+  ```json
+  {
+    "status": "UP",
+    "application": "UP",
+    "database": "UP",
+    "mockMode": true,
+    "realEmailEnabled": false,
+    "autoApplyEnabled": false,
+    "timestamp": "2026-10-01T12:08:16.707165"
+  }
+  ```
+
