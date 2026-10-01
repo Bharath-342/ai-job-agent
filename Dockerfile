@@ -32,7 +32,6 @@ USER appuser
 COPY --from=backend-builder /app/backend/target/ai-job-agent-1.0.0.jar app.jar
 
 ENV PORT=8080
-ENV SPRING_PROFILES_ACTIVE=prod
 EXPOSE ${PORT}
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
