@@ -9,6 +9,7 @@ import com.jobagent.repository.ApplicationRepository;
 import com.jobagent.repository.JobRepository;
 import com.jobagent.repository.UserSettingsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class DashboardService {
 
     private final JobRepository jobRepository;
@@ -75,9 +77,8 @@ public class DashboardService {
         dto.setRemainingQuota(Math.max(0, limit - appliedToday));
 
         // Recent events
-        List<ApplicationEventDto> recentEvents = eventRepository.findTop50ByOrderByEventTimeDesc()
+        List<ApplicationEventDto> recentEvents = eventRepository.findRecentEventsByUserId(userId)
             .stream()
-            .filter(e -> e.getApplication().getUser().getId().equals(userId))
             .limit(10)
             .map(e -> {
                 ApplicationEventDto edto = new ApplicationEventDto();
