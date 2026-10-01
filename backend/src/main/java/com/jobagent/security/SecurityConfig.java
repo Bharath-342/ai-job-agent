@@ -52,9 +52,30 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
-                    "/error"
+                    "/actuator/**",
+                    "/error",
+                    "/",
+                    "/index.html",
+                    "/assets/**",
+                    "/*.js",
+                    "/*.css",
+                    "/*.svg",
+                    "/*.png",
+                    "/*.ico",
+                    "/login",
+                    "/register",
+                    "/dashboard",
+                    "/jobs/**",
+                    "/applications/**",
+                    "/resume",
+                    "/profile",
+                    "/emails",
+                    "/notifications",
+                    "/settings",
+                    "/integrations"
                 ).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
